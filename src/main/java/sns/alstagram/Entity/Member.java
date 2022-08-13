@@ -19,8 +19,5 @@ public class Member {
     private String username;
 
     @NotEmpty
-    private String email;
-
-    @NotEmpty
     private String password;
 }
