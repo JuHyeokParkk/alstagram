@@ -9,6 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+
     <title>Login Page</title>
     <!--Made with love by Mutiullah Samim -->
 
@@ -41,12 +42,12 @@
                 </div>
             </div>
             <div class="card-body">
-                <form th:action th:object="${loginAccountDto}" method="post">
+                <form th:action="login" th:object="${loginDto}" method="post">
                     <div class="input-group form-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                         </div>
-                        <input type="text" class="form-control" th:field="*{username}" placeholder="username">
+                        <input type="text" class="form-control" th:field="*{email}" placeholder="username">
 
                     </div>
                     <div class="input-group form-group">
@@ -65,7 +66,7 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex justify-content-center links">
-                    Don't have an account?<a href="join">Sign Up</a>
+                    Don't have an account?<a href="sign-up">Sign Up</a>
                 </div>
                 <div class="d-flex justify-content-center">
                     <a href="#">Forgot your password?</a>
