@@ -24,14 +24,14 @@ public class SignUpController {
     }
 
     @PostMapping("/sign-up")
-    @ResponseBody
-    public ResponseEntity signUp(@ModelAttribute SignUpDto signUpDto) {
+
+    public String signUp(@ModelAttribute SignUpDto signUpDto) {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         signUpDto.setPassword(encoder.encode(signUpDto.getPassword()));
 
         userService.saveUser(signUpDto);
 
-        return new ResponseEntity("success", HttpStatus.OK);
+        return "redirect:/";
     }
 }
