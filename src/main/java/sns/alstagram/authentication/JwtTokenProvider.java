@@ -37,7 +37,7 @@ public class JwtTokenProvider {
         secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    public String generateToken(User user) {
+    public String generateJwt(User user) {
 
         Date issuedDate = new Date();
 
@@ -54,14 +54,14 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String resolveToken(HttpServletRequest request) {
+    public String findTokenFromCookie(HttpServletRequest request) {
 
         Cookie[] currentCookies = request.getCookies();
 
         if(currentCookies == null)
             return null;
         for (int i = 0; i < currentCookies.length; i++) {
-            if(currentCookies[i].getName().equals("jwt")) {
+            if(currentCookies[i].getName().equals("access")) {
                 Cookie jwtCookie = currentCookies[i];
                 String token = jwtCookie.getValue();
 
@@ -74,7 +74,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public Authentication getAuthentication(String token) {
+    public UsernamePasswordAuthenticationToken getAuthentication(String token) {
 
         User user = userService.loadUserByEmail(this.getEmailFromToken(token));
 
@@ -83,6 +83,18 @@ public class JwtTokenProvider {
 
     public String getEmailFromToken(String token) {
         return (String) Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("email");
+    }
+
+    public boolean isValidToken(String token) {
+
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            throw e;
+        }
+
+
     }
 
 

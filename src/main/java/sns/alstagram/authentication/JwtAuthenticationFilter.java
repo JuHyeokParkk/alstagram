@@ -1,34 +1,58 @@
 package sns.alstagram.authentication;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends GenericFilterBean {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
-        String currentToken = jwtTokenProvider.resolveToken((HttpServletRequest)request);
+        try {
 
-        if(currentToken != null) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(currentToken);
+            String currentToken = jwtTokenProvider.findTokenFromCookie(request);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (currentToken != null && jwtTokenProvider.isValidToken(currentToken)) {
+                UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthentication(currentToken);
+
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            }
+            chain.doFilter(request, response);
+
+        } catch (Exception e) {
+
+            Cookie accessInCookie = new Cookie("access", null);
+            Cookie refreshInCookie = new Cookie("refresh", null);
+
+            accessInCookie.setMaxAge(0);
+            refreshInCookie.setMaxAge(0);
+
+            accessInCookie.setPath("/");
+            refreshInCookie.setPath("/");
+
+            response.addCookie(accessInCookie);
+            response.addCookie(refreshInCookie);
 
 
         }
-        chain.doFilter(request, response);
     }
 }

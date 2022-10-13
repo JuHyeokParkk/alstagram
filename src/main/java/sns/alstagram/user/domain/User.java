@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users",
+uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "nickname")
+})
 public class User implements UserDetails {
 
     @Id
@@ -30,6 +35,9 @@ public class User implements UserDetails {
 
     @Column
     private String password;
+
+    @Column
+    private String nickname;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default

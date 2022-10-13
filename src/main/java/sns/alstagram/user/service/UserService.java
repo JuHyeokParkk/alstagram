@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sns.alstagram.user.domain.User;
 import sns.alstagram.user.domain.UserRepository;
-import sns.alstagram.user.dto.LoginDto;
 import sns.alstagram.user.dto.SignUpDto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,12 +33,12 @@ public class UserService implements UserDetailsService {
     @Transactional
     public Long saveUser(SignUpDto signUpDto) {
 
-        List<String> roles = new ArrayList<>();
-        roles.add("ROLE_USER");
+        List<String> roles = Arrays.asList("ROLE_USER");
 
         return userRepository.save(User.builder()
                 .email(signUpDto.getEmail())
                 .roles(roles)
+                .nickname(signUpDto.getNickname())
                 .password(signUpDto.getPassword())
                 .build()).getId();
     }
