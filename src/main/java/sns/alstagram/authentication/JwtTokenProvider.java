@@ -61,7 +61,7 @@ public class JwtTokenProvider {
         if(currentCookies == null)
             return null;
         for (int i = 0; i < currentCookies.length; i++) {
-            if(currentCookies[i].getName().equals("access")) {
+            if(currentCookies[i].getName().equals("jwt")) {
                 Cookie jwtCookie = currentCookies[i];
                 String token = jwtCookie.getValue();
 
