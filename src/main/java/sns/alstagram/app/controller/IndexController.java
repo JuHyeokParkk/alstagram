@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import sns.alstagram.authentication.JwtTokenProvider;
 import sns.alstagram.authentication.RefreshToken;
 import sns.alstagram.authentication.RefreshTokenProvider;
+import sns.alstagram.mail.MailService;
 import sns.alstagram.user.domain.User;
 import sns.alstagram.user.dto.LoginDto;
 import sns.alstagram.user.service.UserService;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,9 +31,11 @@ public class IndexController {
     private final RefreshTokenProvider refreshTokenProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final MailService mailService;
 
     @GetMapping("/")
-    public String indexPage() {
+    public String indexPage() throws MessagingException, IOException {
+        mailService.sendEmailWithAttachment();
         return "login";
     }
 
