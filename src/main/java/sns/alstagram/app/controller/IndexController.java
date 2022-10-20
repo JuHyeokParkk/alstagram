@@ -7,9 +7,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import sns.alstagram.app.EmailAuthDto;
 import sns.alstagram.authentication.JwtTokenProvider;
 import sns.alstagram.authentication.RefreshToken;
 import sns.alstagram.authentication.RefreshTokenProvider;
@@ -20,6 +19,7 @@ import sns.alstagram.user.service.UserService;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -31,12 +31,25 @@ public class IndexController {
     private final RefreshTokenProvider refreshTokenProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final MailService mailService;
+    private final UserService userService;
 
     @GetMapping("/")
-    public String indexPage() throws MessagingException, IOException {
-        mailService.sendEmailWithAttachment();
+    public String indexPage(HttpServletRequest request) {
+
+        String currentToken = jwtTokenProvider.findTokenFromCookie(request);
+
+        if (currentToken != null && jwtTokenProvider.isValidToken(currentToken))
+            return "redirect:/feed";
+
         return "login";
+    }
+
+    @GetMapping("/email-auth/{id}/{uuid}")
+    public String emailAuth(@PathVariable long id, @PathVariable String uuid) throws Exception {
+
+        userService.saveUser(id, uuid);
+
+        return "email-auth";
     }
 
     @PostMapping("/login")

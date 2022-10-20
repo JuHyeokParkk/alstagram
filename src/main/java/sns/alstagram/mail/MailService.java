@@ -1,6 +1,9 @@
 package sns.alstagram.mail;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,19 +31,21 @@ public class MailService {
         javaMailSender.send(msg);
     }
 
-    public void sendEmailWithAttachment() throws MessagingException, IOException {
+    public void sendEmailWithAttachment(long userId, String email, String uuid) throws MessagingException, IOException {
 
         MimeMessage msg = javaMailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(msg, true);
 
-        helper.setTo("my@email.com");
+        helper.setTo(email);
 
-        helper.setSubject("subject~");
+        helper.setSubject("sign up mail");
 
-        helper.setText("<h1>hello</h1>\n" +
-                "<a href=\"https://www.youtube.com/\">link</a>" +
-                "<img src=\"img-url\"", true);
+        String url = "http://localhost:8080/email-auth/" + userId + "/" + uuid;
+
+        String linkHtml =  "<a href=\"" + url +"\">click here</a>";
+
+        helper.setText(linkHtml, true);
 
         javaMailSender.send(msg);
     }
