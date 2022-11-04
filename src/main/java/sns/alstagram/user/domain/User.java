@@ -37,8 +37,21 @@ public class User implements UserDetails {
     private String password;
 
     @Column
+    private Integer loginFailCount;
+
+    @Column
     private String nickname;
 
+    @Column
+    private boolean locked;
+
+    public void failCountPlus() {
+        loginFailCount++;
+    }
+
+    public void lockAccount() {
+        locked = true;
+    }
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();

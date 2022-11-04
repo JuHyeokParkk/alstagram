@@ -55,6 +55,27 @@ public class IndexController {
     @PostMapping("/login")
     public ResponseEntity login(@Valid @RequestBody LoginDto loginDto, HttpServletResponse response) {
 
+        String email = loginDto.getEmail();
+        String password = loginDto.getPassword();
+
+        if(userService.loadUserByUsername(email) != null) {
+
+            User passwordFailUser = userService.loadUserByUsername(loginDto.getEmail());
+
+            if(passwordFailUser.isLocked()) {
+                return new ResponseEntity("account lock", HttpStatus.BAD_REQUEST);
+            }
+
+            passwordFailUser.failCountPlus();
+
+            if(passwordFailUser.getLoginFailCount() == 5) {
+                passwordFailUser.lockAccount();
+            }
+
+            return new ResponseEntity("wrong password", HttpStatus.BAD_REQUEST);
+
+        }
+
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
